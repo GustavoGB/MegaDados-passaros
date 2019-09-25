@@ -7,13 +7,17 @@ CREATE TABLE usuario (
     nome VARCHAR(80),
     EMAIL VARCHAR(80),
     cidade VARCHAR(80),
-    ativo BOOLEAN,
+    ativo BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(id_usuario)
 );
 
 CREATE TABLE passaro (
 	id_passaro INT NOT NULL auto_increment,
+<<<<<<< HEAD
     especie VARCHAR(80),
+=======
+    especie VARCHAR(80) UNIQUE,
+>>>>>>> d3ea6a1a64b2d2197a052b46e5c5fcc91da469a1
     PRIMARY KEY (id_passaro)
 );
 
@@ -33,7 +37,7 @@ CREATE TABLE post (
     titulo VARCHAR(80) NOT NULL,
     texto VARCHAR(300),
     url VARCHAR(200),
-    ativo BOOLEAN,
+    ativo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (id_usuario)
 		REFERENCES usuario (id_usuario),
     PRIMARY KEY (id_post, id_usuario)
