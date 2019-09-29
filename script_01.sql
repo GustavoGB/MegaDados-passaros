@@ -13,11 +13,8 @@ CREATE TABLE usuario (
 
 CREATE TABLE passaro (
 	id_passaro INT NOT NULL auto_increment,
-<<<<<<< HEAD
     especie VARCHAR(80),
-=======
     especie VARCHAR(80) UNIQUE,
->>>>>>> d3ea6a1a64b2d2197a052b46e5c5fcc91da469a1
     PRIMARY KEY (id_passaro)
 );
 
