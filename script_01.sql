@@ -22,8 +22,9 @@ CREATE TABLE usuario_passaro (
     id_passaro INT NOT NULL,
     FOREIGN KEY (id_usuario)
 		REFERENCES usuario (id_usuario),
-	FOREIGN KEY (id_passaro)
-		REFERENCES passaro (id_passaro),
+	CONSTRAINT fk_passaro FOREIGN KEY (id_passaro)
+		REFERENCES passaro (id_passaro)
+    ON DELETE CASCADE,
 	PRIMARY KEY (id_usuario, id_passaro)
 );
 
@@ -58,8 +59,9 @@ CREATE TABLE tag_passaro (
     id_passaro INT NOT NULL,
     FOREIGN KEY (id_post)
 		REFERENCES post (id_post),
-	FOREIGN KEY (id_passaro)
-		REFERENCES passaro (id_passaro),
+	CONSTRAINT fk2_passaro FOREIGN KEY (id_passaro)
+		REFERENCES passaro (id_passaro)
+    ON DELETE CASCADE,
 	PRIMARY KEY (id_post, id_passaro)
 );
 

@@ -17,7 +17,7 @@ def return_db_results(connection, query, args=None):#Gambiarra para pegar o id
         l = []
         for result in cursor:
             l.append(result) 
-        return result
+            return result
     
 #TESTES: INSERIR USUARIO, REMOVER USUARIO(REMOVER LOGICAMENTE TAMBÉM TODOS OS SEUS POSTS),
 #  INSERIR PASSARO (NÃO DEIXAR INSERIR DOIS PASSAROS DO MESMO TIPO), TENTAR INSERIR POST SEM TÍTULO,
@@ -52,10 +52,28 @@ class TestCase(unittest.TestCase):
 
         query = 'SELECT nome, EMAIL, cidade FROM usuario'
         self.assertEqual(return_db_results(connection, query), ('Joao', 'joao@hotmail.com', 'SP'), "Deveria retorna os atributos inseridos")
+        connection.commit()
     
     def test_remove_usuario(self):
-        pass #ESPERAR A CRIAÇÃO DOS TRIGGERS
+        connection = pymysql.connect(
+            host='localhost',
+            user='root',
+            password='vlm1998',
+            database='p_megadados')
         
+        query = "INSERT INTO usuario (nome, EMAIL, cidade) VALUES ('Joao Vitor', 'joao@hotmail.com', 'SP')"
+        run_db_query(connection, query)
+
+        query = "UPDATE usuario SET ativo = False WHERE nome = 'Joao Vitor'"
+        run_db_query(connection, query)
+
+        query = "SELECT ativo FROM usuario WHERE nome = 'Joao Vitor'"
+        self.assertEqual(return_db_results(connection, query), (0,), "O campo ativo deveria ser falso")
+
+        #Verificando se os posts desse usuario foram deletados logicamente:
+
+
+
     def test_insercao_passaro(self): #Checa inserção e a constraint unique na espécie
         connection = pymysql.connect(
             host='localhost',
