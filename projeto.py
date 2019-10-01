@@ -117,3 +117,12 @@ def lista_visualizacoes(conn, id_post):
 
 def lista_posts(conn, id_usuario):
 	return
+
+def checa_ativo_post(conn, id_usuario):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT ativo FROM post WHERE id_usuario = %s', (id_usuario))
+        res = cursor.fetchone()
+        if res:
+            return res[0] #Retorna se está 1 ou 0
+        else:
+            return -1

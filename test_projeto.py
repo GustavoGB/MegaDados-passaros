@@ -61,9 +61,22 @@ class TestProjeto(unittest.TestCase):
         res = lista_usuarios(conn)
         self.assertCountEqual(res, (id,))
 
+    
+        #Inserimos algum posts
+        titulo = 'Primeiro post'
+        texto = titulo
+        url = 'https://'
+        adiciona_post(conn, titulo, id, texto, url)
+
+        #Removemos o usuario
         remove_usuario(conn, id)
 
+        #Checamos se ele foi desativado
         res = checa_ativo(conn, id)
+        self.assertFalse(res)
+
+        #Checamos se o post foi desativado
+        res = checa_ativo_post(conn, id)
         self.assertFalse(res)
 
     def test_muda_nome_usuario(self):
