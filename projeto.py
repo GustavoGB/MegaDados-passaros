@@ -109,18 +109,49 @@ def adiciona_post(conn, titulo, id_usuario, texto, url):
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adcionar {titulo} na tabela post')
 
+def remove_post(conn, id_post):
+    with conn.cursor() as cursor:
+        cursor.execute('UPDATE post SET ativo = False WHERE id_post = %s', (id_post))
+
+def lista_posts_usuario(conn, id_usuario):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM post WHERE id_usuario=%s', (id_usuario))
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+def lista_posts(conn):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM post')
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+def acha_post(conn, id_usuario, titulo):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM post WHERE id_usuario=%s AND titulo=%s', (id_usuario, titulo))
+        res = cursor.fetchone()
+        if res:
+            return res[0]
+        else:
+            return None
+
 def adiciona_tags(conn, id_post):
 	return
+
+def adiciona_visualizacoes(conn, id_usuario, id_post, aparelho, browser, ip, instante):
+  with conn.cursor() as cursor:
+        try:
+            cursor.execute('INSERT INTO visualizacao (id_usuario, id_post, aparelho, browser, ip, instante) VALUES (%s, %s, %s, %s, %s, %s)', (id_usuario, id_post, aparelho, browser, ip, instante))
+        except pymysql.err.IntegrityError as e:
+            raise ValueError(f'Não posso adcionar {id_usuario} na tabela visualizacao')
 
 def lista_visualizacoes(conn, id_post):
 	return
 
-def lista_posts(conn, id_usuario):
-	return
-
-def checa_ativo_post(conn, id_usuario):
+def checa_ativo_post(conn, id_post):
     with conn.cursor() as cursor:
-        cursor.execute('SELECT ativo FROM post WHERE id_usuario = %s', (id_usuario))
+        cursor.execute('SELECT ativo FROM post WHERE id_post = %s', (id_post))
         res = cursor.fetchone()
         if res:
             return res[0] #Retorna se está 1 ou 0

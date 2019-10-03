@@ -68,6 +68,8 @@ class TestProjeto(unittest.TestCase):
         url = 'https://'
         adiciona_post(conn, titulo, id, texto, url)
 
+        #Guardamos o id do post
+        id_post = acha_post(conn, id, titulo)
         #Removemos o usuario
         remove_usuario(conn, id)
 
@@ -76,7 +78,7 @@ class TestProjeto(unittest.TestCase):
         self.assertFalse(res)
 
         #Checamos se o post foi desativado
-        res = checa_ativo_post(conn, id)
+        res = checa_ativo_post(conn, id_post)
         self.assertFalse(res)
 
     def test_muda_nome_usuario(self):
@@ -156,23 +158,6 @@ class TestProjeto(unittest.TestCase):
 
         res = lista_passaros(conn)
         self.assertFalse(res)
-
-    #def test_muda_nome_passaro(self):
-     #   conn = self.__class__.connection
-
-      #  adiciona_passaro(conn, 'Beija-flor')
-       # adiciona_passaro(conn, 'Gavião')
-        #id = acha_passaro(conn, 'Gavião')
-
-        # Tenta mudar nome para algum nome já existente.
-        #try:
-         #   muda_nome_passaro(conn, id, 'alface')
-          #  self.fail('Não deveria ter mudado o nome.')
-        #except ValueError as e:
-         #   pass
-
-        # Tenta mudar nome para nome inexistente.
-        #muda_nome_comida(conn, id, 'azeitona')
 
     def test_lista_passaros(self):
         conn = self.__class__.connection
@@ -259,6 +244,121 @@ class TestProjeto(unittest.TestCase):
 
         res = lista_prefenrecias_de_usuario(conn, id_pedro)
         self.assertFalse(res)
+
+    def test_adiciona_post(self):
+        conn = self.__class__.connection
+
+        #Cria usuario
+        email = '@'
+        cidade = 'SP'
+        adiciona_usuario(conn, 'José', email, cidade)
+        id_usuario = acha_usuario(conn, 'José')
+
+        #Checa se foi criado
+        self.assertIsNotNone(id_usuario)
+        
+        #Cria post
+        adiciona_post(conn, 'Exemplo', id_usuario, 'Texto', 'http://')
+
+        #Checa se foi criado
+        self.assertIsNotNone(lista_posts_usuario(conn, id_usuario)) #Lista todos os posts do usuario
+
+        #Tenta adicionar post sem título
+        try:
+            adiciona_post(conn, None, id_usuario, 'Texto', 'http://')
+            self.fail('Nao deveria ter adicionado o post sem título.')
+        except ValueError as e:
+            pass
+                
+    def test_remove_post(self):
+        conn = self.__class__.connection
+
+        #Cria usuario
+        email = '@'
+        cidade = 'RJ'
+        adiciona_usuario(conn, 'Bruno Dratcu', email, cidade)
+        id_usuario = acha_usuario(conn, 'Bruno Dratcu')
+
+        #Checa se foi criado
+        self.assertIsNotNone(id_usuario)
+
+        adiciona_post(conn, 'Meu pássaro favorito', id_usuario, 'Canário', 'https://')
+
+        #Acha o post
+        id_post = acha_post(conn, id_usuario, 'Meu pássaro favorito')#Supondo que um usuario nao tenha posts com o mesmo titulo
+        self.assertIsNotNone(id_post)
+
+        #Removemos o post
+        remove_post(conn, id_post)
+
+        #Checamos se o post foi desativado
+        res = checa_ativo_post(conn, id_post)
+        self.assertFalse(res)
+
+    def test_lista_posts(self):
+            conn = self.__class__.connection
+
+            # Verifica que ainda não tem posts no sistema.
+            res = lista_posts(conn)
+            self.assertFalse(res)
+
+            #Cria usuario
+            email = '@'
+            cidade = 'RJ'
+            adiciona_usuario(conn, 'Bruno Dratcu', email, cidade)
+            id_usuario = acha_usuario(conn, 'Bruno Dratcu')
+
+            #Checa se foi criado
+            self.assertIsNotNone(id_usuario)
+
+            # Adiciona alguns posts.
+            adiciona_post(conn, 'Meu pássaro favorito', id_usuario, 'Canário', 'https://')
+            adiciona_post(conn, 'Passarinho', id_usuario, 'lalala', 'https://')
+            adiciona_post(conn, 'Animais', id_usuario, 'Periquito', 'https://')
+
+            l_ids = []
+            id1 = acha_post(conn, id_usuario,'Meu pássaro favorito') 
+            id2 = acha_post(conn, id_usuario,'Passarinho') 
+            id3 = acha_post(conn, id_usuario,'Animais') 
+            l_ids.append(id1)
+            l_ids.append(id2)
+            l_ids.append(id3)
+
+            # Verifica se os posts foram adicionados corretamente.
+            res = lista_posts(conn) #Lista todos os posts, não apenas de um usuário
+            self.assertCountEqual(res, l_ids)
+
+            # Remove os posts.
+            for p in res:
+                remove_post(conn, p)
+
+            # Verifica que todos posts foram removidos.
+            for p in res:
+                ativo = checa_ativo_post(conn, p)
+                self.assertFalse(ativo)
+
+    def test_adiciona_visualizacoes(self):
+            conn = self.__class__.connection
+
+            #Cria dois usuarios
+            #Cria usuario
+            email = '@'
+            cidade = 'RJ'
+            adiciona_usuario(conn, 'Bruno Draco', email, cidade)
+            id_usuario = acha_usuario(conn, 'Bruno Draco')
+
+            #Checa se foi criado
+            self.assertIsNotNone(id_usuario)
+
+            #Cria o post de um usuario
+            adiciona_post(conn, 'Meu último post', id_usuario, 'Cacatua', 'https://')
+
+            #Checa se foi criado
+            self.assertIsNotNone(acha_post(conn, id_usuario, 'Meu último post'))
+
+            #Um usuario visualiza o post
+
+            #Checa se esta visualizado
 
 def run_sql_script(filename):
     global config
