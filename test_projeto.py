@@ -8,6 +8,8 @@ import subprocess
 import unittest
 import pymysql
 from projeto import *
+from parse import *
+ 
 
 class TestProjeto(unittest.TestCase):
     @classmethod
@@ -80,6 +82,41 @@ class TestProjeto(unittest.TestCase):
         res = checa_ativo_post(conn, id_post)
         self.assertFalse(res)
 
+
+
+    def test_adiciona_tag_usuario(self):
+
+        conn = self.__class__.connection
+        email = '@'
+        cidade = 'SP'
+        adiciona_usuario(conn, 'Roberto', email, cidade)
+        id = acha_usuario(conn, 'Roberto')
+
+        res = lista_usuarios(conn)
+        self.assertCountEqual(res, (id,))
+
+    
+        #Inserimos algum posts
+        titulo = 'Primeiro post'
+        texto = "Olha pra ser sincero @VictorLM,eu não gosto de #Pombas não..."
+        url = 'https://'
+        adiciona_post(conn, titulo, id, texto, url)
+
+        #Guardamos o id do post
+        id_post = acha_post(conn, id, titulo)
+
+        #Checamos se o post foi desativado
+        res = checa_ativo_post(conn, id_post)
+        self.assertFalse(res)
+
+        # Checa se o usuario existe.
+        id = acha_usuario(conn, nome)
+        self.assertIsNotNone(id)
+
+        res = adiciona_tags(conn,id_post)
+        self.assertFalse(res)
+
+    
     def test_muda_nome_usuario(self):
         conn = self.__class__.connection
 

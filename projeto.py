@@ -144,12 +144,18 @@ def adiciona_tags(conn, id_post):
         cursor.execute('SELECT texto  FROM id_post WHERE id_passaro=%s AND id_usuario=%s')
         res = cursor.fetchall()
         ##Parsear o res, se tiver @ add ao tag_usuario, se tiver # add ao tag_passario.
-        res_parse_usuario = parse("res{}","res@")
-        if res_parse_usuario == '@':
-            cursor.execute('INSERT INTO tag_usuario VALUES (%s)', (id_usuario))
+        res_parse_usuario = res.partition("@")
+        usuario = res_parse_usuario.split(separator = '@',max = 0) #nao consigo usar o split() sem separator
+
+        res_parse_passaro = res.partition("#")
+        passaro = res_parse_passaro.split(separator = '#',max = 0)
+
+        print(usuario)
+        if usuario == usuario[0]:
+            cursor.execute('INSERT INTO tag_usuario VALUES (%s,%s)', (id_post,id_usuario))
         res_parse_passaro = parse("res{}","res#")
-        if res_parse_passaro == '#':
-            cursor.execute('INSERT INTO usuario_passaro VALUES (%s)', (id_passaro))
+        if passaro== passaro[0]:
+            cursor.execute('INSERT INTO tag_passaro VALUES (%s, %s)', (id_post, id_passaro))
 
 def adiciona_visualizacoes(conn, id_usuario, id_post, aparelho, browser, ip, instante):
   with conn.cursor() as cursor:
