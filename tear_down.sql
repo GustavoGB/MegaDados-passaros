@@ -1,1 +1,1 @@
-DROP DATABASE IF EXISTS tranqueira;
+DROP DATABASE IF EXISTS p_megadados;

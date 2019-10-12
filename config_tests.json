@@ -1,7 +1,7 @@
 {
-    "MYSQL": "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql",
+    "MYSQL": "/usr/local/bin/mysql",
     "HOST": "127.0.0.1",
-    "USER": "root",
-    "PASS": "vlm1998",
+    "USER": "megadados",
+    "PASS": "linux123",
     "LOGFILE": "log.txt"
 }

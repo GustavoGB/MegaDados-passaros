@@ -1,4 +1,6 @@
 import pymysql
+from parse import * 
+from parse import compile 
 
 def adiciona_usuario(conn, nome, email, cidade):
     with conn.cursor() as cursor:
@@ -137,7 +139,17 @@ def acha_post(conn, id_usuario, titulo):
             return None
 
 def adiciona_tags(conn, id_post):
-	return
+    with conn.cursor() as cursor:
+        ##Nao considerei que eh possivel add as tags no titulo, so add select texto AND titulo
+        cursor.execute('SELECT texto  FROM id_post WHERE id_passaro=%s AND id_usuario=%s')
+        res = cursor.fetchall()
+        ##Parsear o res, se tiver @ add ao tag_usuario, se tiver # add ao tag_passario.
+        res_parse_usuario = parse("res{}","res@")
+        if res_parse_usuario == '@':
+            cursor.execute('INSERT INTO tag_usuario VALUES (%s)', (id_usuario))
+        res_parse_passaro = parse("res{}","res#")
+        if res_parse_passaro == '#':
+            cursor.execute('INSERT INTO usuario_passaro VALUES (%s)', (id_passaro))
 
 def adiciona_visualizacoes(conn, id_usuario, id_post, aparelho, browser, ip, instante):
   with conn.cursor() as cursor:
