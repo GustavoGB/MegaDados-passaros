@@ -8,7 +8,6 @@ import subprocess
 import unittest
 import pymysql
 from projeto import *
-from parse import *
  
 
 class TestProjeto(unittest.TestCase):
