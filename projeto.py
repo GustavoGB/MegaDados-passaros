@@ -68,13 +68,6 @@ def remove_passaro(conn, id_passaro):
     with conn.cursor() as cursor:
         cursor.execute('DELETE FROM passaro WHERE id_passaro=%s', (id_passaro))
 
-#def muda_nome_passaro(conn, id, novo_nome): #FAZER
- #   with conn.cursor() as cursor:
-  #      try:
-   #         cursor.execute('UPDATE comida SET nome=%s where id=%s', (novo_nome, id))
-    #    except pymysql.err.IntegrityError as e:
-     #       raise ValueError(f'Não posso alterar nome do id {id} para {novo_nome} na tabela comida')
-
 def lista_passaros(conn):
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_passaro from passaro')
@@ -139,33 +132,81 @@ def acha_post(conn, id_usuario, titulo):
             return None
 
 def adiciona_tags(conn, id_post):
+    #Por enquanto só funciona quando as marcações tiverem espaço em seguida da marcação
     with conn.cursor() as cursor:
         ##Nao considerei que eh possivel add as tags no titulo, so add select texto AND titulo
-        cursor.execute('SELECT texto  FROM id_post WHERE id_passaro=%s AND id_usuario=%s')
+        cursor.execute('SELECT texto FROM post WHERE id_post=%s', id_post)
+        res = cursor.fetchone()
+        ##Parsear o res, se tiver @ add ao tag_usuario, se tiver # add ao tag_passaro.
+        try:
+            texto = str(res[0])
+            i = texto.find("@")
+            if i != -1:
+                fim = texto.find(" ",i)#Acha o fim da tag
+                tag_usuario = texto[i:fim]
+            else:
+                tag_usuario = None
+
+            i = texto.find("#")
+            if i != -1:
+                fim = texto.find(" ",i)#Acha o fim da tag
+                tag_passaro = texto[i:fim]
+            else: 
+                tag_passaro = None
+
+        except Exception as e:
+            return -1   
+        
+        if "@" in tag_usuario:
+            usuario = tag_usuario[1:] #excluindo o @
+            id_usuario = acha_usuario(conn, usuario)
+        else:
+            id_usuario = None
+        if tag_passaro is not None:
+            passaro = tag_passaro[1:] #excluindo o @
+            id_passaro = acha_passaro(conn, passaro)
+        else: 
+            id_passaro = None
+
+        if (id_usuario != None):
+            try:
+                cursor.execute('INSERT INTO tag_usuario (id_post, id_usuario) VALUES (%s, %s)', (id_post, id_usuario))
+            except pymysql.err.IntegrityError as e:
+                raise ValueError(f'Não posso adcionar {id_usuario} na tabela tag_usuario')
+
+        if (id_passaro != None):
+            try:
+                cursor.execute('INSERT INTO tag_passaro (id_post, id_passaro) VALUES (%s, %s)', (id_post, id_passaro))
+            except pymysql.err.IntegrityError as e:
+                raise ValueError(f'Não posso adcionar {id_passaro} na tabela tag_passaro')
+
+def lista_tags_usuario(conn, id_usuario): #lista todos os posts em que um usuario foi marcado
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM tag_usuario WHERE id_usuario=%s', id_usuario)
         res = cursor.fetchall()
-        ##Parsear o res, se tiver @ add ao tag_usuario, se tiver # add ao tag_passario.
-        res_parse_usuario = res.partition("@")
-        usuario = res_parse_usuario.split(separator = '@',max = 0) #nao consigo usar o split() sem separator
+        posts = tuple(x[0] for x in res)
+        return posts
 
-        res_parse_passaro = res.partition("#")
-        passaro = res_parse_passaro.split(separator = '#',max = 0)
 
-        print(usuario)
-        if usuario == usuario[0]:
-            cursor.execute('INSERT INTO tag_usuario VALUES (%s,%s)', (id_post,id_usuario))
-        res_parse_passaro = parse("res{}","res#")
-        if passaro== passaro[0]:
-            cursor.execute('INSERT INTO tag_passaro VALUES (%s, %s)', (id_post, id_passaro))
-
-def adiciona_visualizacoes(conn, id_usuario, id_post, aparelho, browser, ip, instante):
+def lista_tags_passaro(conn, id_passaro): #lista todos os posts em que um passaro foi marcado
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM tag_passaro WHERE id_passaro=%s', id_passaro)
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+def adiciona_visualizacao(conn, id_usuario, id_post, aparelho, browser, ip):
   with conn.cursor() as cursor:
         try:
-            cursor.execute('INSERT INTO visualizacao (id_usuario, id_post, aparelho, browser, ip, instante) VALUES (%s, %s, %s, %s, %s, %s)', (id_usuario, id_post, aparelho, browser, ip, instante))
+            cursor.execute('INSERT INTO visualizacao (id_usuario, id_post, aparelho, browser, ip) VALUES (%s, %s, %s, %s, %s)', (id_usuario, id_post, aparelho, browser, ip))
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adcionar {id_usuario} na tabela visualizacao')
 
-def lista_visualizacoes(conn, id_post):
-	return
+def lista_visualizacao(conn, id_post):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_usuario FROM visualizacao WHERE id_post=%s', id_post)
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
 
 def checa_ativo_post(conn, id_post):
     with conn.cursor() as cursor:

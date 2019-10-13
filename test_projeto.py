@@ -84,38 +84,48 @@ class TestProjeto(unittest.TestCase):
 
 
 
-    def test_adiciona_tag_usuario(self):
+    def test_adiciona_tags(self):
 
         conn = self.__class__.connection
         email = '@'
         cidade = 'SP'
-        adiciona_usuario(conn, 'Roberto', email, cidade)
-        id = acha_usuario(conn, 'Roberto')
+        nome = 'VictorLM' #Adicionando o usuario que será marcado
+        adiciona_usuario(conn, nome, email, cidade)
+
+        #adicionando o passaro que será marcado
+        adiciona_passaro(conn, "Pomba")
+
+        #Checa se o passaro existe
+        id_passaro = acha_passaro(conn, "Pomba")
+        self.assertIsNotNone(id_passaro)
+
+        # Checa se o usuario existe.
+        id_usuario = acha_usuario(conn, nome)
+        self.assertIsNotNone(id_usuario)
 
         res = lista_usuarios(conn)
-        self.assertCountEqual(res, (id,))
+        self.assertCountEqual(res, (id_usuario,))
 
     
         #Inserimos algum posts
         titulo = 'Primeiro post'
-        texto = "Olha pra ser sincero @VictorLM,eu não gosto de #Pombas não..."
+        texto = "Olha pra ser sincero @VictorLM ,eu não gosto de #Pomba não..."
         url = 'https://'
-        adiciona_post(conn, titulo, id, texto, url)
+        adiciona_post(conn, titulo, id_usuario, texto, url)
 
         #Guardamos o id do post
-        id_post = acha_post(conn, id, titulo)
+        id_post = acha_post(conn, id_usuario, titulo)
 
-        #Checamos se o post foi desativado
-        res = checa_ativo_post(conn, id_post)
-        self.assertFalse(res)
-
-        # Checa se o usuario existe.
-        id = acha_usuario(conn, nome)
-        self.assertIsNotNone(id)
-
-        res = adiciona_tags(conn,id_post)
-        self.assertFalse(res)
-
+        #Adiciona tags em tags de usuario e passaro
+        teste = adiciona_tags(conn,id_post) #O teste serve para debugar caso dê erro
+        #print(teste)
+        res = lista_tags_usuario(conn, id_usuario)
+        #Confere se a tag foi adicionada corretamente
+        self.assertEqual(res, (id_post,))
+        
+        res = lista_tags_passaro(conn, id_passaro)
+        #Confere se a tag foi adicionada corretamente
+        self.assertEqual(res, (id_post,))
     
     def test_muda_nome_usuario(self):
         conn = self.__class__.connection
@@ -373,7 +383,7 @@ class TestProjeto(unittest.TestCase):
                 ativo = checa_ativo_post(conn, p)
                 self.assertFalse(ativo)
 
-    def test_adiciona_visualizacoes(self):
+    def test_adiciona_visualizacao(self):
             conn = self.__class__.connection
 
             #Cria dois usuarios
@@ -387,14 +397,18 @@ class TestProjeto(unittest.TestCase):
             self.assertIsNotNone(id_usuario)
 
             #Cria o post de um usuario
-            adiciona_post(conn, 'Meu último post', id_usuario, 'Cacatua', 'https://')
-
+            titulo = 'Meu último post'
+            adiciona_post(conn, titulo, id_usuario, 'Cacatua', 'https://')
+            id_post = acha_post(conn, id_usuario, titulo)
             #Checa se foi criado
-            self.assertIsNotNone(acha_post(conn, id_usuario, 'Meu último post'))
+            self.assertIsNotNone(id_post)
 
             #Um usuario visualiza o post
-
+            adiciona_visualizacao(conn, id_usuario,id_post,"Iphone X", "Firefox", "'192.168.4.13")
+            
             #Checa se esta visualizado
+            res = lista_visualizacao(conn, id_post)
+            self.assertIsNotNone(res)
 
 def run_sql_script(filename):
     global config

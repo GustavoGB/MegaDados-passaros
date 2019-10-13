@@ -1,1 +1,1 @@
-DROP DATABASE IF EXISTS p_megadados;
+DROP DATABASE IF EXISTS p_megadadossss;
