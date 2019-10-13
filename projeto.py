@@ -1,6 +1,5 @@
 import pymysql
-from parse import * 
-from parse import compile 
+ 
 
 def adiciona_usuario(conn, nome, email, cidade):
     with conn.cursor() as cursor:
