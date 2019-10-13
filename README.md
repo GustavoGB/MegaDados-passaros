@@ -112,8 +112,6 @@ if __name__ = '__main__':
 
  No nosso caso a automatização teve um problema. O arquivo de testes deveria rodar todos os scripts de criação de tables e triggers antes dos testes. No entanto, percebe-se que não é isto que está acontecendo, sendo necessário rodar os scripts manualmente antes de rodar os testes. Para evitar este transtorno, colocamos temporariamente um nome errado no projeto do arquivo tear down (para evitar que o banco seja destruído e os scripts tenham de ser rodados manualmente).
 
- então ao rodar o script.py de teste não conseguimos criar o banco por ele(acreditamos que por conta de algum bug com o tear_down.sql), logo tivemos que rodar os scripts.sql de criação do banco, para assim rodarmos os testes e verificar se as funções implementadas funcionavam ou não.  
-
  Todas as funções de implementação estão no arquivo projeto.py e os testes do mesmo estão no arquivo test_projeto.py
  
  Como forma de apresentação vamos mostrar a implementação de uma das funções feitas no projeto :
