@@ -38,8 +38,8 @@ A entidade usuário é responsável por guardar informações importantes do usu
 
 | visualizacao | tipo | PK| FK
 | --- | --- | ---| ---|
-| id_usuario | INT(11) | | X
-| id_post | INT(11) | | X
+| id_usuario | INT(11) | X | X
+| id_post | INT(11) | X | X
 | aparelho| VARCHAR(80)| |
 | browser| VARCHAR(80)| |
 | ip | VARCHAR(80)| |
@@ -51,7 +51,7 @@ A entidade visualização é responsável por pegar as informações do usuário
 
 | post| tipo| PK|  FK
 | --- | --- | ---| ---|
-| id_usuario | INT(11) |   | X| 
+| id_usuario | INT(11) |  X | X| 
 | id_post    | INT(11)     | X|
 | titulo     | VARCHAR(80) |  |
 | texto      | VARCHAR(300)|  |
@@ -64,8 +64,8 @@ A entidade post guarda os posts realizados na nossa rede social, eles incluem um
 
 | tag_usuario| tipo| PK|  FK
 | --- | --- | ---| ---|
-| id_post    | INT(11)    |  | X 
-| id_usuario | INT(11)    |  | X
+| id_post    | INT(11)    | X | X 
+| id_usuario | INT(11)    | X | X
 
 A entidade Tag_usuario tem a função de guardar a tag de um usuário assim que este mesmo for comentado em algum post. Dessa forma, guarda-se o id do post e o id do usuário nesta tabela.
 
@@ -73,8 +73,8 @@ A entidade Tag_usuario tem a função de guardar a tag de um usuário assim que 
 
 | tag_passaro| tipo| PK|  FK
 | --- | --- | ---| ---|
-| id_post    | INT(11)    |  | X 
-| id_passaro | INT(11)    |  | X
+| id_post    | INT(11)    | X | X 
+| id_passaro | INT(11)    | X | X
 
 A entidade Tag_Passaro tem a função de guardar a tag de um pássaro assim que este mesmo for comentado em algum post. Dessa forma, guarda-se o id do post e o id do pássaro nesta tabela.
 
