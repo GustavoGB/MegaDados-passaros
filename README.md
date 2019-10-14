@@ -11,7 +11,7 @@ Para explicar o nosso modelo foi necessário criar entidades(tabelas) para conse
 | id_passaro | INT(11)|X|
 | especie | VARCHAR(80)| |  
 
-A entidade pássaros será responsável por guardar o id dos mesmos e qual é o tipo da espécie. 
+A entidade pássaros será responsável por guardar o id dos mesmos e qual é o tipo da espécie. Restrição: não é possível adicionar espécies com o mesmo nome, o id é incrementado automaticamente.
 
 
 ## Usuário_pássaro
@@ -31,7 +31,7 @@ A entidade usuario_passaro é uma tabela relacional entre a entidade Pássaros e
 | cidade| VARCHAR(80)  | | 
 | ativo | TINYINT(1)|  | |
 
-A entidade usuário é responsável por guardar informações importantes do usuário como nome, localização e endereço de email, além de saber se o usuário está ativo na rede ou não.
+A entidade usuário é responsável por guardar informações importantes do usuário como nome, localização e endereço de email, além de saber se o usuário está ativo na rede ou não. Em updates das tabela usuário, verifica-se o status ativo do usuário em questão: caso este update torne o usuário inativo, foi criado um trigger responsável por indicar que os posts deste usuário também estão inativos.
 
 
 ## Visualização
@@ -82,7 +82,7 @@ A entidade Tag_Passaro tem a função de guardar a tag de um pássaro assim que 
 # Schema
 
 A partir do enunciado e da ideia de modelos relacionais, foi possível juntar o nosso dicionário e formar o seguinte modelo entidade-relacional:
-
+![Modelo](modelo_entidades.jpeg)
 ![Diagrama](diagramaPassaros.png)
 
 
