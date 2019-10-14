@@ -108,7 +108,7 @@ class TestProjeto(unittest.TestCase):
     
         #Inserimos algum posts
         titulo = 'Primeiro post'
-        texto = "Olha pra ser sincero @VictorLM ,eu não gosto de #Pomba não..."
+        texto = "Olha pra ser sincero @VictorLM,eu não gosto de #Pomba não..."
         url = 'https://'
         adiciona_post(conn, titulo, id_usuario, texto, url)
 

@@ -141,7 +141,15 @@ def adiciona_tags(conn, id_post):
             texto = str(res[0])
             i = texto.find("@")
             if (i != -1):
+                ponto = texto.find(".", i)
+                virgula = texto.find(",", i)
                 fim = texto.find(" ",i)#Acha o fim da tag
+
+                if(ponto and ponto<fim and ponto<virgula):
+                    fim = ponto
+                if(virgula and virgula<fim and virgula<ponto):
+                    fim = virgula
+
                 tag_usuario = texto[i:fim]
             else:
                 tag_usuario = None
