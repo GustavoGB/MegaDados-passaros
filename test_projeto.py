@@ -117,7 +117,7 @@ class TestProjeto(unittest.TestCase):
 
         #Adiciona tags em tags de usuario e passaro
         teste = adiciona_tags(conn,id_post) #O teste serve para debugar caso dê erro
-        #print(teste)
+        print(teste)
         res = lista_tags_usuario(conn, id_usuario)
         #Confere se a tag foi adicionada corretamente
         self.assertEqual(res, (id_post,))

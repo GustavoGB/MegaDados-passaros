@@ -140,7 +140,7 @@ def adiciona_tags(conn, id_post):
         try:
             texto = str(res[0])
             i = texto.find("@")
-            if i != -1:
+            if (i != -1):
                 fim = texto.find(" ",i)#Acha o fim da tag
                 tag_usuario = texto[i:fim]
             else:
@@ -152,7 +152,6 @@ def adiciona_tags(conn, id_post):
                 tag_passaro = texto[i:fim]
             else: 
                 tag_passaro = None
-
         except Exception as e:
             return -1   
         
