@@ -139,52 +139,55 @@ def adiciona_tags(conn, id_post):
         ##Parsear o res, se tiver @ add ao tag_usuario, se tiver # add ao tag_passaro.
         try:
             texto = str(res[0])
-            i = texto.find("@")
-            if (i != -1):
-                ponto = texto.find(".", i)
-                virgula = texto.find(",", i)
-                fim = texto.find(" ",i)#Acha o fim da tag
+            tags_usuario = []
+            lista_texto = texto.split()
+            for palavra in lista_texto:
+                i = palavra.find("@")
+                if(i!=-1):
+                    if(palavra.find(",")):
+                        virgula = palavra.find(",")
+                        palavra = palavra[1:virgula]
+                        tags_usuario.append(palavra)
+                    elif(palavra.find(".")):
+                        ponto = palavra.find(".")
+                        palavra = palavra[1:ponto]
+                        tags_usuario.append(palavra)
+                    else:
+                        tags_usuario.append(palavra)
 
-                if(ponto and ponto<fim and ponto<virgula):
-                    fim = ponto
-                if(virgula and virgula<fim and virgula<ponto):
-                    fim = virgula
+            tags_passaro = []
+            for palavra in lista_texto:
+                i = palavra.find("#")
+                if(i!=-1):
+                    if(palavra.find(",")):
+                        virgula = palavra.find(",")
+                        palavra = palavra[1:virgula]
+                        tags_passaro.append(palavra)
+                    elif(palavra.find(".")):
+                        ponto = palavra.find(".")
+                        palavra = palavra[1:ponto]
+                        tags_passaro.append(palavra)
+                    else:
+                        tags_passaro.append(palavra)
 
-                tag_usuario = texto[i:fim]
-            else:
-                tag_usuario = None
-
-            i = texto.find("#")
-            if i != -1:
-                fim = texto.find(" ",i)#Acha o fim da tag
-                tag_passaro = texto[i:fim]
-            else: 
-                tag_passaro = None
         except Exception as e:
             return -1   
-        
-        if "@" in tag_usuario:
-            usuario = tag_usuario[1:] #excluindo o @
+
+        for usuario in tags_usuario:
             id_usuario = acha_usuario(conn, usuario)
-        else:
-            id_usuario = None
-        if tag_passaro is not None:
-            passaro = tag_passaro[1:] #excluindo o @
+            if (id_usuario != None):
+                try:
+                    cursor.execute('INSERT INTO tag_usuario (id_post, id_usuario) VALUES (%s, %s)', (id_post, id_usuario))
+                except pymysql.err.IntegrityError as e:
+                    raise ValueError(f'Não posso adcionar {id_usuario} na tabela tag_usuario')
+        for passaro in tags_passaro:
             id_passaro = acha_passaro(conn, passaro)
-        else: 
-            id_passaro = None
-
-        if (id_usuario != None):
-            try:
-                cursor.execute('INSERT INTO tag_usuario (id_post, id_usuario) VALUES (%s, %s)', (id_post, id_usuario))
-            except pymysql.err.IntegrityError as e:
-                raise ValueError(f'Não posso adcionar {id_usuario} na tabela tag_usuario')
-
-        if (id_passaro != None):
-            try:
-                cursor.execute('INSERT INTO tag_passaro (id_post, id_passaro) VALUES (%s, %s)', (id_post, id_passaro))
-            except pymysql.err.IntegrityError as e:
-                raise ValueError(f'Não posso adcionar {id_passaro} na tabela tag_passaro')
+            if (id_passaro != None):
+                try:
+                    cursor.execute('INSERT INTO tag_passaro (id_post, id_passaro) VALUES (%s, %s)', (id_post, id_passaro))
+                except pymysql.err.IntegrityError as e:
+                    raise ValueError(f'Não posso adcionar {id_passaro} na tabela tag_passaro')
+                
 
 def lista_tags_usuario(conn, id_usuario): #lista todos os posts em que um usuario foi marcado
     with conn.cursor() as cursor:

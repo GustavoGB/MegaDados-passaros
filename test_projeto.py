@@ -108,7 +108,7 @@ class TestProjeto(unittest.TestCase):
     
         #Inserimos algum posts
         titulo = 'Primeiro post'
-        texto = "Olha pra ser sincero @VictorLM,eu não gosto de #Pomba não..."
+        texto = "Olha pra ser sincero @VictorLM, eu não gosto de #Pomba."
         url = 'https://'
         adiciona_post(conn, titulo, id_usuario, texto, url)
 
@@ -116,8 +116,7 @@ class TestProjeto(unittest.TestCase):
         id_post = acha_post(conn, id_usuario, titulo)
 
         #Adiciona tags em tags de usuario e passaro
-        teste = adiciona_tags(conn,id_post) #O teste serve para debugar caso dê erro
-        print(teste)
+        adiciona_tags(conn,id_post)
         res = lista_tags_usuario(conn, id_usuario)
         #Confere se a tag foi adicionada corretamente
         self.assertEqual(res, (id_post,))
