@@ -394,7 +394,6 @@ class TestProjeto(unittest.TestCase):
     def test_adiciona_visualizacao(self):
             conn = self.__class__.connection
 
-            #Cria dois usuarios
             #Cria usuario
             email = '@'
             cidade = 'RJ'
@@ -417,6 +416,62 @@ class TestProjeto(unittest.TestCase):
             #Checa se esta visualizado
             res = lista_visualizacao(conn, id_post)
             self.assertIsNotNone(res)
+
+    def test_joinha(self):
+        conn = self.__class__.connection
+
+        #Cria usuario
+        email = '@'
+        cidade = 'RJ'
+        adiciona_usuario(conn, 'Bruno Draco', email, cidade)
+        id_usuario = acha_usuario(conn, 'Bruno Draco')
+
+        #Checa se foi criado
+        self.assertIsNotNone(id_usuario)
+
+        #Cria o post de um usuario
+        titulo = 'Meu último post'
+        adiciona_post(conn, titulo, id_usuario, 'Cacatua', 'https://')
+        id_post = acha_post(conn, id_usuario, titulo)
+        #Checa se foi criado
+        self.assertIsNotNone(id_post)
+        
+        #O usuario visualiza o post
+        adiciona_visualizacao(conn, id_usuario,id_post,"Iphone X", "Firefox", "'192.168.4.13")
+        
+        #Checa se esta visualizado
+        res = lista_visualizacao(conn, id_post)
+        self.assertIsNotNone(res)
+
+        #O usuário registra um joinha
+        adiciona_joinha(conn, id_usuario, id_post, 1)
+        res = lista_joinhas_post(conn, id_post)
+        #Checa se esta registrado
+        self.assertCountEqual(res, (id_usuario,))
+
+        #Checa se deu joinha mesmo
+        res = lista_joinha_unico(conn, id_usuario, id_post)
+        self.assertTrue(res)
+
+        #Troca para anti-joinha
+        adiciona_joinha(conn, id_usuario, id_post, 0)
+
+        #Checa se deu anti-joinha mesmo
+        res =lista_joinha_unico(conn, id_usuario, id_post)
+        self.assertFalse(res)
+
+        #Remove o joinha
+        remove_joinha(conn, id_usuario, id_post)
+        #Checa se foi removido
+        res = lista_joinhas_post(conn, id_post)
+        self.assertFalse(res)
+
+        #Confere se não adiciona dois joinhas do mesmo usuario no mesmo post
+        adiciona_joinha(conn, id_usuario, id_post, 0)
+        adiciona_joinha(conn, id_usuario, id_post, 0)
+        #Lista
+        res = lista_joinhas_post(conn, id_post)
+        self.assertCountEqual(res, (id_usuario,)) #Só pode ter um
 
 def run_sql_script(filename):
     global config

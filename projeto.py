@@ -225,3 +225,50 @@ def checa_ativo_post(conn, id_post):
             return res[0] #Retorna se está 1 ou 0
         else:
             return -1
+
+def adiciona_joinha(conn, id_usuario, id_post, joinha):
+ with conn.cursor() as cursor:
+        try: #Checa se o joinha existe, se existe troca o existente
+            cursor.execute('SELECT estado FROM joinha WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+            res = cursor.fetchone()
+            if res: #Troca o existente
+                if(joinha == 1):
+                    cursor.execute('UPDATE joinha SET estado = True WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+                if(joinha == 0):
+                    cursor.execute('UPDATE joinha SET estado = False WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+            else:
+                #Cria um novo joinha
+                if(joinha == 1):
+                    cursor.execute('INSERT INTO joinha (id_usuario, id_post, estado) VALUES (%s, %s, True)', (id_usuario, id_post))
+                if(joinha == 0):
+                    cursor.execute('INSERT INTO joinha (id_usuario, id_post, estado) VALUES (%s, %s, False)', (id_usuario, id_post))
+
+        except pymysql.err.IntegrityError as e:
+            raise ValueError(f'Não posso adcionar {joinha} na tabela joinha')
+
+def remove_joinha(conn, id_usuario, id_post):
+    with conn.cursor() as cursor:
+        cursor.execute('DELETE FROM joinha WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+
+def lista_joinhas_post(conn, id_post):
+ with conn.cursor() as cursor:
+        cursor.execute('SELECT id_usuario FROM joinha WHERE id_post = %s', (id_post))
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+def lista_joinhas_usuario(conn, id_usuario):
+ with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM joinha WHERE id_usuario = %s', (id_usuario))
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+def lista_joinha_unico(conn, id_usuario, id_post):
+ with conn.cursor() as cursor:
+        cursor.execute('SELECT estado FROM joinha WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+        res = cursor.fetchone()
+        if res:
+            return res[0] #Retorna se está 1 ou 0
+        else:
+            return -1
