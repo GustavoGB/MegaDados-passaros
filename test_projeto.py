@@ -89,7 +89,10 @@ class TestProjeto(unittest.TestCase):
         email = '@'
         cidade = 'SP'
         nome = 'VictorLM' #Adicionando o usuario que será marcado
+        nome2 = 'Gustavo'
         adiciona_usuario(conn, nome, email, cidade)
+        #Adiciona outro usuario para teste
+        adiciona_usuario(conn, nome2, email, cidade)
 
         #adicionando o passaro que será marcado
         adiciona_passaro(conn, "Pomba")
@@ -101,14 +104,17 @@ class TestProjeto(unittest.TestCase):
         # Checa se o usuario existe.
         id_usuario = acha_usuario(conn, nome)
         self.assertIsNotNone(id_usuario)
+        # Checa se o usuario 2 existe.
+        id_usuario2 = acha_usuario(conn, nome2)
+        self.assertIsNotNone(id_usuario2)
 
         res = lista_usuarios(conn)
-        self.assertCountEqual(res, (id_usuario,))
+        self.assertCountEqual(res, (id_usuario, id_usuario2))
 
     
         #Inserimos algum posts
         titulo = 'Primeiro post'
-        texto = "Olha pra ser sincero @VictorLM, eu não gosto de #Pomba."
+        texto = "Olha pra ser sincero @VictorLM, @Gustavo, eu não gosto de #Pomba."
         url = 'https://'
         adiciona_post(conn, titulo, id_usuario, texto, url)
 
@@ -119,8 +125,12 @@ class TestProjeto(unittest.TestCase):
         adiciona_tags(conn,id_post)
         res = lista_tags_usuario(conn, id_usuario)
         #Confere se a tag foi adicionada corretamente
-        self.assertEqual(res, (id_post,))
-        
+        self.assertEqual(res, (id_post, ))
+
+        res = lista_tags_usuario(conn, id_usuario2)
+        #Confere se a tag foi adicionada corretamente
+        self.assertEqual(res, (id_post, ))
+
         res = lista_tags_passaro(conn, id_passaro)
         #Confere se a tag foi adicionada corretamente
         self.assertEqual(res, (id_post,))
