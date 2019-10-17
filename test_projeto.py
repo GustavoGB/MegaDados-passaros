@@ -473,7 +473,7 @@ class TestProjeto(unittest.TestCase):
         res = lista_joinhas_post(conn, id_post)
         self.assertCountEqual(res, (id_usuario,)) #Só pode ter um
     
-    def test_function_consulta_posts(self):
+    def test_procedure_consulta_posts(self):
         conn = self.__class__.connection
         #Cria usuario
         email = '@'
@@ -507,14 +507,176 @@ class TestProjeto(unittest.TestCase):
         res = procedure_consulta_posts(conn, id_usuario) 
         self.assertEqual(res, (id_post1, id_post2, id_post3))
     
-    def test_view_usuario_popular(self):
-        pass
+    def test_procedure_usuario_popular(self):
+        conn = self.__class__.connection
+        email = '@'
+        cidade = 'SP'
+        nome = 'VictorLM' #Adicionando o usuario
+        adiciona_usuario(conn, nome, email, cidade)
+        #Adiciona outro usuario para teste
+        nome2 = 'Gustavo'
+        adiciona_usuario(conn, nome2, email, cidade)
+
+        #Para efeitos de teste, adiciona um usuário que não cria nenhum post
+        nome3 = "Claudio"
+        cidade2 = "RJ"
+        #De outra cidade diferente
+        adiciona_usuario(conn, nome3, email, cidade2)
+
+
+        # Checa se o usuario existe.
+        id_usuario = acha_usuario(conn, nome)
+        self.assertIsNotNone(id_usuario)
+        # Checa se o usuario 2 existe.
+        id_usuario2 = acha_usuario(conn, nome2)
+        self.assertIsNotNone(id_usuario2)
+       # Checa se o usuario 3 existe.
+        id_usuario3 = acha_usuario(conn, nome3)
+        self.assertIsNotNone(id_usuario3)
+
+        res = lista_usuarios(conn)
+        self.assertCountEqual(res, (id_usuario, id_usuario2, id_usuario3))
+
     
-    def test_function_lista_referencias(self):
-        pass
+        #Inserimos algum posts
+        titulo = 'Primeiro post'
+        texto = "Olha pra ser sincero @Claudio, @Gustavo, eu não gosto de #Pomba."
+        url = 'https://'
+        adiciona_post(conn, titulo, id_usuario, texto, url)
+
+        titulo2 = "Segundo post"
+        texto2 = "Vou marcar só o @Claudio."
+        adiciona_post(conn, titulo2, id_usuario, texto2, url)
+
+        #Guardamos o id do post
+        id_post = acha_post(conn, id_usuario, titulo)
+        id_post2 = acha_post(conn, id_usuario, titulo2)
+
+        #Adiciona tags
+        adiciona_tags(conn,id_post)
+        adiciona_tags(conn,id_post2)
+        res = lista_tags_usuario(conn, id_usuario3)
+        #Confere se as tags foi adicionada corretamente
+        self.assertEqual(res, (id_post, id_post2))
+
+        #Confere a view do usuário mais popular
+        #Precisa ser o Claudio e o Gustavo, que foi marcado num post a mais
+        #Os dois estão em cidades diferentes, mas o VictorLM não (que não deve aparecer pois nao é marcado)
+        num = 2 #Passa-se o número de cidades que deseja-se pesquisar
+        res = procedure_usuario_popular(conn, num)
+        self.assertEqual(res, ((nome3, cidade2), (nome2, cidade))) #Como são duas, esperamos dois resultados
     
+    def test_procedure_lista_referencias(self):
+        conn = self.__class__.connection
+        email = '@'
+        cidade = 'SP'
+        nome = 'VictorLM' #Adicionando o usuario
+        adiciona_usuario(conn, nome, email, cidade)
+        #Adiciona outro usuario para teste
+        nome2 = 'Gustavo'
+        adiciona_usuario(conn, nome2, email, cidade)
+        #Adiciona outro usuario para teste
+        nome3 = 'Claudio'
+        adiciona_usuario(conn, nome3, email, cidade)
+
+        # Checa se o usuario existe.
+        id_usuario = acha_usuario(conn, nome)
+        self.assertIsNotNone(id_usuario)
+        # Checa se o usuario 2 existe.
+        id_usuario2 = acha_usuario(conn, nome2)
+        self.assertIsNotNone(id_usuario2)
+        # Checa se o usuario 3 existe.
+        id_usuario3 = acha_usuario(conn, nome3)
+        self.assertIsNotNone(id_usuario3)
+
+        res = lista_usuarios(conn)
+        self.assertCountEqual(res, (id_usuario, id_usuario2, id_usuario3))
+
+        #Inserimos algum posts
+        titulo = 'Primeiro post'
+        texto = "Olha pra ser sincero @Gustavo, eu não gosto de #Pomba."
+        url = 'https://'
+        adiciona_post(conn, titulo, id_usuario, texto, url)
+
+        titulo2 = "Segundo post"
+        texto2 = "Vou marcar só o @Gustavo."
+        adiciona_post(conn, titulo2, id_usuario, texto2, url)
+
+        #Terceiro post, mas criado por outro usuario
+        titulo3 = "Post"
+        texto3 = "Vou marcar o @Gustavo."
+        adiciona_post(conn, titulo3, id_usuario3, texto3, url)
+
+        #Guardamos o id do post
+        id_post = acha_post(conn, id_usuario, titulo)
+        id_post2 = acha_post(conn, id_usuario, titulo2)
+        id_post3 = acha_post(conn, id_usuario3, titulo3)
+
+
+        #Adiciona tags
+        adiciona_tags(conn,id_post)
+        adiciona_tags(conn,id_post2)
+        adiciona_tags(conn,id_post3)
+
+        res = lista_tags_usuario(conn, id_usuario2)
+        #Confere se as tags foi adicionada corretamente
+        self.assertEqual(res, (id_post, id_post2, id_post3))
+
+        #Confere a função que lista os usuários que referenciam o Gustavo
+        #Deve retornar tanto o VictorLM quanto o Claudio
+        res = procedure_lista_referencias(conn, id_usuario2)
+        self.assertEqual(res, (id_usuario, id_usuario3))
+
     def test_view_aparelho_browser(self):
-        pass
+        conn = self.__class__.connection
+        #Cria usuario que vai criar o post
+        email = '@'
+        cidade = 'RJ'
+        nome = 'Usuario'
+        adiciona_usuario(conn, nome, email, cidade)
+        id_usuario = acha_usuario(conn, nome)
+        #Cria o usuario que vai visualizar o post
+        nome2 = 'Usuario2'
+        adiciona_usuario(conn, nome2, email, cidade)
+        id_usuario2 = acha_usuario(conn, nome2)
+        #Cria outro usuario que vai visualizar o post
+        nome3 = 'Usuario3'
+        adiciona_usuario(conn, nome3, email, cidade)
+        id_usuario3 = acha_usuario(conn, nome3)
+        #Cria o usuario que vai visualizar o post
+        nome4 = 'Usuario4'
+        adiciona_usuario(conn, nome4, email, cidade)
+        id_usuario4 = acha_usuario(conn, nome4)
+
+
+        #Checa se foi criado
+        self.assertIsNotNone(id_usuario)
+        self.assertIsNotNone(id_usuario2)
+        self.assertIsNotNone(id_usuario3)
+        self.assertIsNotNone(id_usuario4)
+
+
+        #Cria o post de um usuario
+        titulo = 'Meu último post'
+        adiciona_post(conn, titulo, id_usuario, 'Cacatua', 'https://')
+        id_post = acha_post(conn, id_usuario, titulo)
+        #Checa se foi criado
+        self.assertIsNotNone(id_post)
+
+        #Usuarios visualizam o post
+        adiciona_visualizacao(conn, id_usuario2 ,id_post,"Iphone X", "Firefox", "'192.168.4.13")
+        adiciona_visualizacao(conn, id_usuario3 ,id_post,"Iphone 7", "Chrome", "'192.168.4.13")
+        adiciona_visualizacao(conn, id_usuario4 ,id_post,"Iphone 8", "Explorer", "'192.168.4.13")
+
+        #Checa se esta visualizado
+        res = lista_visualizacao(conn, id_post)
+        self.assertIsNotNone(res)
+
+        tabela_cruzada = (('Iphone X', 'Firefox'), ('Iphone 7', 'Chrome'), ('Iphone 8', 'Explorer'))
+
+        #Chama a view
+        res = view_aparelho_browser(conn)
+        self.assertEqual(res, tabela_cruzada)
 
     def test_view_url_passaros(self):
         pass

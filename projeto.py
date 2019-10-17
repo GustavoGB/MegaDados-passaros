@@ -273,27 +273,28 @@ def lista_joinha_unico(conn, id_usuario, id_post):
         else:
             return -1
 
-def chama_view(conn, nome):
-    with conn.cursor() as cursor:
-        cursor.execute('SELECT * FROM %s', (nome))
-        res = cursor.fetchall()
-        ret = tuple(x[0] for x in res)
-        return ret
-
-def chama_procedure(conn, nome, lista_parametros):
-    with conn.cursor() as cursor:
-        string = nome+str(lista_parametros)
-        string = string.replace("[", "(")
-        string = string.replace("]", ")")
-        cursor.execute('CALL %s', (string))
-        res = cursor.fetchall()
-        ret = tuple(x[0] for x in res)
-        return ret
-
 def procedure_consulta_posts(conn, id_usuario):
     with conn.cursor() as cursor:
         cursor.execute('CALL consulta_posts(%s)', (id_usuario))
-        res = cursor.fetchone()
+        res = cursor.fetchall()
+        ret = tuple(x[0] for x in res)
+        return ret
+
+def procedure_usuario_popular(conn, num):
+    with conn.cursor() as cursor:
+        cursor.execute('CALL usuario_popular(%s)', (num) )
+        res = cursor.fetchall()
         return res
 
-    
+def procedure_lista_referencias(conn, id_usuario):
+    with conn.cursor() as cursor:
+        cursor.execute('CALL lista_referencias(%s)', (id_usuario) )
+        res = cursor.fetchall()
+        ret = tuple(x[0] for x in res)
+        return ret
+
+def view_aparelho_browser(conn):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM aparelho_browser')
+        res = cursor.fetchall()
+        return res
