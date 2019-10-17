@@ -472,6 +472,52 @@ class TestProjeto(unittest.TestCase):
         #Lista
         res = lista_joinhas_post(conn, id_post)
         self.assertCountEqual(res, (id_usuario,)) #Só pode ter um
+    
+    def test_function_consulta_posts(self):
+        conn = self.__class__.connection
+        #Cria usuario
+        email = '@'
+        cidade = 'RJ'
+        adiciona_usuario(conn, 'Bruno Draco', email, cidade)
+        id_usuario = acha_usuario(conn, 'Bruno Draco')
+
+        #Checa se foi criado
+        self.assertIsNotNone(id_usuario)
+
+        #Cria vários posts do usuario
+        titulo = 'Meu primeiro post'
+        adiciona_post(conn, titulo, id_usuario, 'Cacatua', 'https://')
+        id_post1 = acha_post(conn, id_usuario, titulo)
+        #Checa se foi criado
+        self.assertIsNotNone(id_post1)
+
+        titulo = 'Meu segundo post'
+        adiciona_post(conn, titulo, id_usuario, 'Cacatua', 'https://')
+        id_post2 = acha_post(conn, id_usuario, titulo)
+        #Checa se foi criado
+        self.assertIsNotNone(id_post2)
+
+        titulo = 'Meu terceiro post'
+        adiciona_post(conn, titulo, id_usuario, 'Cacatua', 'https://')
+        id_post3 = acha_post(conn, id_usuario, titulo)
+        #Checa se foi criado
+        self.assertIsNotNone(id_post3)
+
+        #Consulta ordem cronológica reversa dos posts
+        res = procedure_consulta_posts(conn, id_usuario) 
+        self.assertEqual(res, (id_post1, id_post2, id_post3))
+    
+    def test_view_usuario_popular(self):
+        pass
+    
+    def test_function_lista_referencias(self):
+        pass
+    
+    def test_view_aparelho_browser(self):
+        pass
+
+    def test_view_url_passaros(self):
+        pass
 
 def run_sql_script(filename):
     global config

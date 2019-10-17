@@ -272,3 +272,28 @@ def lista_joinha_unico(conn, id_usuario, id_post):
             return res[0] #Retorna se está 1 ou 0
         else:
             return -1
+
+def chama_view(conn, nome):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM %s', (nome))
+        res = cursor.fetchall()
+        ret = tuple(x[0] for x in res)
+        return ret
+
+def chama_procedure(conn, nome, lista_parametros):
+    with conn.cursor() as cursor:
+        string = nome+str(lista_parametros)
+        string = string.replace("[", "(")
+        string = string.replace("]", ")")
+        cursor.execute('CALL %s', (string))
+        res = cursor.fetchall()
+        ret = tuple(x[0] for x in res)
+        return ret
+
+def procedure_consulta_posts(conn, id_usuario):
+    with conn.cursor() as cursor:
+        cursor.execute('CALL consulta_posts(%s)', (id_usuario))
+        res = cursor.fetchone()
+        return res
+
+    

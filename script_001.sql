@@ -35,6 +35,7 @@ CREATE TABLE post (
     texto VARCHAR(300),
     url VARCHAR(200),
     ativo BOOLEAN DEFAULT TRUE,
+    instante TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario)
 		REFERENCES usuario (id_usuario),
     PRIMARY KEY (id_post, id_usuario)
