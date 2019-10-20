@@ -4,6 +4,21 @@ O projeto é uma pequena rede social que envolve pássaros, em que os usuários 
 
 # Dicionário de Dados 
 Para explicar o nosso modelo foi necessário criar entidades(tabelas) para conseguir ter controle dos testes a serem feitos passados no enunciado, resultando em 7 entidades. Contando com o fato de que uma das entidades é uma view. 
+Atulizando o dicinário para a segunda fase da entrega, concluí-se que o projeto teria mais 2 tabelas amais, além de duas views.
+
+## Joinha
+| joinha | tipo | PK| FK|
+| --- | --- | ---| --| ---|
+| id_usuario | INT(11)|X|X|
+| id_post | INT(11)|X| X|
+| estado  | TINYINT| | | 
+
+## Pássaro_URL
+| passaro_url | tipo | PK| FK|
+| --- | --- | ---| --| ---|
+| id_passaro | INT(11)|X|X|
+| URL | VARCHAR(200)|X| |
+
 
 ## Pássaro
 | passaro | tipo | PK| FK|
@@ -82,8 +97,16 @@ A entidade Tag_Passaro tem a função de guardar a tag de um pássaro assim que 
 # Schema
 
 A partir do enunciado e da ideia de modelos relacionais, foi possível juntar o nosso dicionário e formar o seguinte modelo entidade-relacional:
+### Fase 1
 ![Modelo](modelo_entidades.jpeg)
+
 ![Diagrama](diagramaPassaros.png)
+
+
+
+### Fase 2
+
+![Diagrama](diagramaPassaros2.png)
 
 
 # Testes
@@ -173,6 +196,13 @@ def test_remove_usuario(self):
  ```
 
 O teste acima foi projetado para testes a função de remover os usuários. Entretanto, é possível perceber que mais testes foram testados, já que para saber se um usuário foi deletado ou não, é necessário saber se ele estava ativo, e se ele realmente existe. Além disso, inserimos um post neste caso para mostrar que, ao desativar um usuário o post é deletado logicamente também, estando no banco mas não sendo mostrado por ter a variável de atividade negada. 
+
+
+## REST 
+
+Além dos testes, a segunda fase pediu com que utilizássemos um modelo de REST API para conversar com as funções que já tinham sido implementadas. Assim para cada função feita, criou-se um EndPoint e um método em REST para conversar com a API via a url desse EndPoint. Foi possível realizar tudo deste jeito pois é só atrelar o que as queries no SQL estáo fazendo por função. Assim, quando dermos um SELECT em alguma função, o objetivo no REST será dar um GET que irá listar as opções desejadas da URL definida pelos parâmetros.
+Dessa forma é possível simular uma aplicação real criando testes específicos para os endpoints criados. 
+Utilizamos a recomendação do professor que é uma biblioteca para python desenvolvida em go e node.js chamada fastAPI.  
 
 
 
