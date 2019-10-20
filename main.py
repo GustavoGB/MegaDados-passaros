@@ -198,7 +198,7 @@ def lista_posts(conn):
         posts = tuple(x[0] for x in res)
         return posts
 
-#Encontra post baseado no titulo
+#Encontra post baseado no titulo e no usuario
 @app.get("/posts/{id_post}/{id_usuario}/{titulo}")
 def acha_post(conn, id_usuario, titulo):
     conn = connect_db()
@@ -206,6 +206,102 @@ def acha_post(conn, id_usuario, titulo):
         cursor.execute('SELECT id_post FROM post WHERE id_usuario=%s AND titulo=%s', (id_usuario, titulo))
         res = cursor.fetchone()
         if res:
-            return res[0]
+            return res[0] 
         else:
             return None
+        
+#Adiciona tag usuario e tag passaros
+@app.post("/tag_usuario/{id_post}/{id_usuario}")
+@app.post("/tag_passaro/{id_post}/{id_passaro}")
+def adiciona_tags(conn, id_post):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT texto FROM post WHERE id_post=%s', id_post)
+        res = cursor.fetchone()
+        ##Parsear o res, se tiver @ add ao tag_usuario, se tiver # add ao tag_passaro.
+        try:
+            texto = str(res[0])
+            tags_usuario = []
+            lista_texto = texto.split()
+            for palavra in lista_texto:
+                i = palavra.find("@")
+                if(i!=-1):
+                    if(palavra.find(",")):
+                        virgula = palavra.find(",")
+                        palavra = palavra[1:virgula]
+                        tags_usuario.append(palavra)
+                    elif(palavra.find(".")):
+                        ponto = palavra.find(".")
+                        palavra = palavra[1:ponto]
+                        tags_usuario.append(palavra)
+                    else:
+                        tags_usuario.append(palavra)
+
+            tags_passaro = []
+            for palavra in lista_texto:
+                i = palavra.find("#")
+                if(i!=-1):
+                    if(palavra.find(",")):
+                        virgula = palavra.find(",")
+                        palavra = palavra[1:virgula]
+                        tags_passaro.append(palavra)
+                    elif(palavra.find(".")):
+                        ponto = palavra.find(".")
+                        palavra = palavra[1:ponto]
+                        tags_passaro.append(palavra)
+                    else:
+                        tags_passaro.append(palavra)
+
+        except Exception as e:
+            return -1   
+
+        for usuario in tags_usuario:
+            id_usuario = acha_usuario(conn, usuario)
+            if (id_usuario != None):
+                try:
+                    cursor.execute('INSERT INTO tag_usuario (id_post, id_usuario) VALUES (%s, %s)', (id_post, id_usuario))
+                except pymysql.err.IntegrityError as e:
+                    raise ValueError(f'Não posso adcionar {id_usuario} na tabela tag_usuario')
+        for passaro in tags_passaro:
+            id_passaro = acha_passaro(conn, passaro)
+            if (id_passaro != None):
+                try:
+                    cursor.execute('INSERT INTO tag_passaro (id_post, id_passaro) VALUES (%s, %s)', (id_post, id_passaro))
+                except pymysql.err.IntegrityError as e:
+                    raise ValueError(f'Não posso adcionar {id_passaro} na tabela tag_passaro')
+
+#Lista tags do usuarios baseado em marcacoes de post
+@app.get("/tags_usuario/{id_post}/{id_usuario}")
+def lista_tags_usuario(conn, id_usuario):
+    conn = connect_db() 
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM tag_usuario WHERE id_usuario=%s', id_usuario)
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+#Lista tags de passaros basedo em marcacoes de post
+@app.get("/tags_passaro/{id_post}/{id_passaro}")
+def lista_tags_passaro(conn, id_passaro):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM tag_passaro WHERE id_passaro=%s', id_passaro)
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+#Adiciona uma view
+@app.post("/view/{id_usuario}/{id_post}/{id_post}/{id_aparelho}/{aparelho}/{browser}/{ip}") 
+def adiciona_visualizacao(conn, id_usuario, id_post, aparelho, browser, ip):
+      conn = connect_db()
+      with conn.cursor() as cursor:
+        try:
+            cursor.execute('INSERT INTO visualizacao (id_usuario, id_post, aparelho, browser, ip) VALUES (%s, %s, %s, %s, %s)', (id_usuario, id_post, aparelho, browser, ip))
+        except pymysql.err.IntegrityError as e:
+            raise ValueError(f'Não posso adcionar {id_usuario} na tabela visualizacao')
+
+
+
+
+
+                
