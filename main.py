@@ -291,7 +291,7 @@ def lista_tags_passaro(conn, id_passaro):
         return posts
 
 #Adiciona uma view
-@app.post("/view/{id_usuario}/{id_post}/{id_post}/{id_aparelho}/{aparelho}/{browser}/{ip}") 
+@app.post("/view/{id_usuario}/{id_post}/{id_aparelho}/{aparelho}/{browser}/{ip}") 
 def adiciona_visualizacao(conn, id_usuario, id_post, aparelho, browser, ip):
       conn = connect_db()
       with conn.cursor() as cursor:
