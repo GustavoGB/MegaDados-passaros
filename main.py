@@ -391,7 +391,8 @@ def view_aparelho_browser(conn):
         res = cursor.fetchall()
         return res
 
-#Consulta dos posts nao sei cmo a funcao chamada no CALL se comporta no rest, get put post ou delete ? 
+#Lista posts
+@app.get("/posts/{id_post}/{id_usuario}")
 def procedure_consulta_posts(conn, id_usuario):
     conn = connect_db()
     with conn.cursor() as cursor:
@@ -400,4 +401,20 @@ def procedure_consulta_posts(conn, id_usuario):
         ret = tuple(x[0] for x in res)
         return ret
 
+#Lista usuarios mais comentados em sua cidade
+@app.get("/nomes/cidades/{id_usuario}") 
+def procedure_usuario_popular(conn, num):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('CALL usuario_popular(%s)', (num) )
+        res = cursor.fetchall()
+        return res
+#Lista as referencias de usuarios em posts
+@app.get("/referencias/{id_usuario}")
+def procedure_lista_referencias(conn, id_usuario):
+    with conn.cursor() as cursor:
+        cursor.execute('CALL lista_referencias(%s)', (id_usuario) )
+        res = cursor.fetchall()
+        ret = tuple(x[0] for x in res)
+        return ret
                 
