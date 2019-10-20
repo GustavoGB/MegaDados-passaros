@@ -1,12 +1,38 @@
 from fastapi import FastAPI
-from pydantic import BaseModel 
 import pymysql
 
 app = FastAPI()
 
+
+#Ideal para conec pois nao mostra a senha, utlizando o de baixo para testes. 
+
+#class TestProjeto(unittest.TestCase):
+#    @classmethod
+#    def setUpClass(cls):
+#        global config
+#        cls.connection = pymysql.connect(
+#            host=config['HOST'],
+#            user=config['USER'],
+#            password=config['PASS'],
+#            database='p_megadados'
+#        )
+
+#   @classmethod
+#   def tearDownClass(cls):
+#       cls.connection.close()
+
+def connect_db(host='localhost',user='root',password='MegaDados',database='rede_passaros'):
+    conn = pymysql.connect(
+        host='localhost',
+        user='megadados',
+        password='linux123',
+        database='p_megadados')
+    return conn
+
 #Adiciona Usuario
 @app.post("/usuarios/{id_usuario}")
 def adiciona_usuario(conn, nome, email, cidade):
+    conn = connect_db()
     with conn.cursor() as cursor:
         try:
             cursor.execute('INSERT INTO usuario (nome, EMAIL, cidade) VALUES (%s, %s, %s)', (nome, email, cidade))
@@ -16,6 +42,7 @@ def adiciona_usuario(conn, nome, email, cidade):
 #Encontra Usuario
 @app.get("/usuarios/{id_usuario}")
 def acha_usuario(conn, nome):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_usuario FROM usuario WHERE nome = %s', (nome))
         res = cursor.fetchone()
@@ -26,6 +53,7 @@ def acha_usuario(conn, nome):
 #Muda nome do Usuario
 @app.put("/usuarios/{id_usuario}")
 def muda_nome_usuario(conn, id_usuario, novo_nome):
+    conn = connect_db()
     with conn.cursor() as cursor:
         try:
             cursor.execute('UPDATE usuario SET nome=%s where id_usuario=%s', (novo_nome, id_usuario))
@@ -34,6 +62,7 @@ def muda_nome_usuario(conn, id_usuario, novo_nome):
 #Remove usuario
 @app.delete("/usuario/{id_usuario}")
 def remove_usuario(conn, id_usuario):
+    conn = connect_db()    
     with conn.cursor() as cursor:
         try:
         	cursor.execute('UPDATE usuario SET ativo = False WHERE id_usuario=%s', (id_usuario))
@@ -42,6 +71,7 @@ def remove_usuario(conn, id_usuario):
 #Lista usuarios
 @app.get("/usuario/{id_usuario}")
 def lista_usuarios(conn):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_usuario from usuario')
         res = cursor.fetchall()
@@ -51,6 +81,7 @@ def lista_usuarios(conn):
 #Checa se usuario existe        
 @app.get("/usuario/{id_usuario}")
 def checa_ativo(conn, id_usuario):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT ativo FROM usuario WHERE id_usuario = %s', (id_usuario))
         res = cursor.fetchone()
@@ -62,6 +93,7 @@ def checa_ativo(conn, id_usuario):
 #Adiciona Passaros
 @app.post("/passaros/{id_passaro}")
 def adiciona_passaro(conn, especie):
+    conn = connect_db()
     with conn.cursor() as cursor:
         try:
             cursor.execute('INSERT INTO passaro (especie) VALUES (%s)', (especie))
@@ -70,6 +102,7 @@ def adiciona_passaro(conn, especie):
 #Encontra um passaro especifico
 @app.get("/passaros/{id_passaro}")
 def acha_passaro(conn, especie):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_passaro FROM passaro WHERE especie = %s', (especie))
         res = cursor.fetchone()
@@ -80,12 +113,14 @@ def acha_passaro(conn, especie):
 #Deleta passaros            
 @app.delete("/passaros/{id_passaro}")
 def remove_passaro(conn, id_passaro):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('DELETE FROM passaro WHERE id_passaro=%s', (id_passaro))
 
 #Lista todos os passaros
 @app.get("/passaros/{id_passaro}")
 def lista_passaros(conn):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_passaro from passaro')
         res = cursor.fetchall()
@@ -95,18 +130,21 @@ def lista_passaros(conn):
 #Adiciona preferencia de um passaro para um usuario
 @app.post("/preferencias/{id_usuario}/{id_passaro}")
 def adiciona_preferencia_a_usuario(conn, id_usuario, id_passaro):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('INSERT INTO usuario_passaro VALUES (%s, %s)', (id_usuario, id_passaro))
 
 #Remove preferencia de um passaro para um usuario
 @app.delete("/preferencias/{id_usuario}/{id_passaro}")
 def remove_preferencia_de_usuario(conn, id_usuario, id_passaro):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('DELETE FROM usuario_passaro WHERE id_usuario=%s AND id_passaro=%s',(id_usuario, id_passaro))
 
 #Lista todas as preferencias de um usuario
 @app.get("/preferencias/{id_usuario}")
 def lista_prefenrecias_de_usuario(conn, id_usuario):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_passaro FROM usuario_passaro WHERE id_usuario=%s', (id_usuario))
         res = cursor.fetchall()
@@ -116,6 +154,7 @@ def lista_prefenrecias_de_usuario(conn, id_usuario):
 #Lista todas as preferencias(id_usuarios) de um certo passaro 
 @app.get("/preferencias/{id_passaro}")
 def lista_preferencias_de_passaro(conn, id_passaro):
+    conn = connect_db()
     with conn.cursor() as cursor:
         cursor.execute('SELECT id_usuario FROM usuario_passaro WHERE id_passaro=%s', (id_passaro))
         res = cursor.fetchall()
@@ -125,11 +164,48 @@ def lista_preferencias_de_passaro(conn, id_passaro):
 #Adiciona post na rede social
 @app.post("/posts/{titulo}/{id_usuario}/{texto}/{url}")
 def adiciona_post(conn, titulo, id_usuario, texto, url):
+    conn = connect_db()
     with conn.cursor() as cursor:
         try:
             cursor.execute('INSERT INTO post (titulo, id_usuario, texto, url) VALUES (%s, %s, %s, %s)', (titulo, id_usuario, texto, url))
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adcionar {titulo} na tabela post')
 
+#Remove post da rede social
+@app.delete("/posts/{id_post}")
+def remove_post(conn, id_post):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('UPDATE post SET ativo = False WHERE id_post = %s', (id_post))
 
+#Lista posts de usuario
+@app.get("/posts/{id_post}/{id_usuario}")
+def lista_posts_usuario(conn, id_usuario):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM post WHERE id_usuario=%s', (id_usuario))
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
 
+#Lista todos os posts
+@app.get("/posts/{id_post}")
+def lista_posts(conn):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM post')
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+#Encontra post baseado no titulo
+@app.get("/posts/{id_post}/{id_usuario}/{titulo}")
+def acha_post(conn, id_usuario, titulo):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM post WHERE id_usuario=%s AND titulo=%s', (id_usuario, titulo))
+        res = cursor.fetchone()
+        if res:
+            return res[0]
+        else:
+            return None
