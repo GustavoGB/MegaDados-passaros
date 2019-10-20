@@ -300,8 +300,104 @@ def adiciona_visualizacao(conn, id_usuario, id_post, aparelho, browser, ip):
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adcionar {id_usuario} na tabela visualizacao')
 
+#Lista os valores de uma visulizacao
+@app.get("/view/{id_post}")
+def lista_visualizacao(conn, id_post):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_usuario FROM visualizacao WHERE id_post=%s', id_post)
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+#Lista os posts que estao ativos
+@app.get("/posts/{id_post}/{ativo}")
+def checa_ativo_post(conn, id_post):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT ativo FROM post WHERE id_post = %s', (id_post))
+        res = cursor.fetchone()
+        if res:
+            return res[0] #Retorna se está 1 ou 0
+        else:
+            return -1
+#Adiciona Joinha nos posts            
+@app.post("/posts/{id_post}/{id_usario}/{joinha}")
+def adiciona_joinha(conn, id_usuario, id_post, joinha):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        try: #Checa se o joinha existe, se existe troca o existente
+            cursor.execute('SELECT estado FROM joinha WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+            res = cursor.fetchone()
+            if res: #Troca o existente
+                if(joinha == 1):
+                    cursor.execute('UPDATE joinha SET estado = True WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+                if(joinha == 0):
+                    cursor.execute('UPDATE joinha SET estado = False WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+            else:
+                #Cria um novo joinha
+                if(joinha == 1):
+                    cursor.execute('INSERT INTO joinha (id_usuario, id_post, estado) VALUES (%s, %s, True)', (id_usuario, id_post))
+                if(joinha == 0):
+                    cursor.execute('INSERT INTO joinha (id_usuario, id_post, estado) VALUES (%s, %s, False)', (id_usuario, id_post))
 
+        except pymysql.err.IntegrityError as e:
+            raise ValueError(f'Não posso adcionar {joinha} na tabela joinha')
 
+#Remove algum joinha
+@app.delete("/posts/{id_post}/{id_usario}/{joinha}")
+def remove_joinha(conn, id_usuario, id_post):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('DELETE FROM joinha WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
 
+#Lista os joinhas em um post
+@app.get("/posts/{id_post}/{joinha}")
+def lista_joinhas_post(conn, id_post):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_usuario FROM joinha WHERE id_post = %s', (id_post))
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+#Lista joinhas de um post de um usuario especifico
+@app.get("/posts/{id_post}/{id_usuario}/{joinha}")
+def lista_joinhas_usuario(conn, id_usuario):
+     conn = connect_db()
+     with conn.cursor() as cursor:
+        cursor.execute('SELECT id_post FROM joinha WHERE id_usuario = %s', (id_usuario))
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
+#Lista joinha unico de um post para cada usuario(estado joinha ou anti-joinha)
+@app.get("/posts/{id_post}/{id_usuario}/{joinha}/{estado}")
+def lista_joinha_unico(conn, id_usuario, id_post):
+     conn = connect_db()
+     with conn.cursor() as cursor:
+        cursor.execute('SELECT estado FROM joinha WHERE id_usuario=%s AND id_post=%s', (id_usuario, id_post))
+        res = cursor.fetchone()
+        if res:
+            return res[0] #Retorna se está 1 ou 0
+        else:
+            return -1
+
+#lista as views
+@app.get("/view")
+def view_aparelho_browser(conn):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM aparelho_browser')
+        res = cursor.fetchall()
+        return res
+
+#Consulta dos posts nao sei cmo a funcao chamada no CALL se comporta no rest, get put post ou delete ? 
+def procedure_consulta_posts(conn, id_usuario):
+    conn = connect_db()
+    with conn.cursor() as cursor:
+        cursor.execute('CALL consulta_posts(%s)', (id_usuario))
+        res = cursor.fetchall()
+        ret = tuple(x[0] for x in res)
+        return ret
 
                 
