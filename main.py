@@ -92,6 +92,44 @@ def lista_passaros(conn):
         passaros = tuple(x[0] for x in res)
         return passaros
 
+#Adiciona preferencia de um passaro para um usuario
+@app.post("/preferencias/{id_usuario}/{id_passaro}")
+def adiciona_preferencia_a_usuario(conn, id_usuario, id_passaro):
+    with conn.cursor() as cursor:
+        cursor.execute('INSERT INTO usuario_passaro VALUES (%s, %s)', (id_usuario, id_passaro))
+
+#Remove preferencia de um passaro para um usuario
+@app.delete("/preferencias/{id_usuario}/{id_passaro}")
+def remove_preferencia_de_usuario(conn, id_usuario, id_passaro):
+    with conn.cursor() as cursor:
+        cursor.execute('DELETE FROM usuario_passaro WHERE id_usuario=%s AND id_passaro=%s',(id_usuario, id_passaro))
+
+#Lista todas as preferencias de um usuario
+@app.get("/preferencias/{id_usuario}")
+def lista_prefenrecias_de_usuario(conn, id_usuario):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_passaro FROM usuario_passaro WHERE id_usuario=%s', (id_usuario))
+        res = cursor.fetchall()
+        preferencias = tuple(x[0] for x in res)
+        return preferencias
+
+#Lista todas as preferencias(id_usuarios) de um certo passaro 
+@app.get("/preferencias/{id_passaro}")
+def lista_preferencias_de_passaro(conn, id_passaro):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id_usuario FROM usuario_passaro WHERE id_passaro=%s', (id_passaro))
+        res = cursor.fetchall()
+        usuarios = tuple(x[0] for x in res)
+        return usuarios
+
+#Adiciona post na rede social
+@app.post("/posts/{titulo}/{id_usuario}/{texto}/{url}")
+def adiciona_post(conn, titulo, id_usuario, texto, url):
+    with conn.cursor() as cursor:
+        try:
+            cursor.execute('INSERT INTO post (titulo, id_usuario, texto, url) VALUES (%s, %s, %s, %s)', (titulo, id_usuario, texto, url))
+        except pymysql.err.IntegrityError as e:
+            raise ValueError(f'Não posso adcionar {titulo} na tabela post')
 
 
 
