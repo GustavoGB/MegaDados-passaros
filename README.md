@@ -7,15 +7,15 @@ Para explicar o nosso modelo foi necessário criar entidades(tabelas) para conse
 Atulizando o dicinário para a segunda fase da entrega, concluí-se que o projeto teria mais 2 tabelas amais, além de duas views.
 
 ## Joinha
-| joinha | tipo | PK| FK|
-| --- | --- | ---| --| ---|
-| id_usuario | INT(11)|X|X|
-| id_post | INT(11)|X| X|
-| estado  | TINYINT| | | 
+| joinha | tipo | PK |    FK |
+| ---    | ---  | ---| --- |
+| id_usuario    | INT(11)|X|X|
+| id_post       | INT(11)|X|X|
+| estado        | TINYINT| | | 
 
 ## Pássaro_URL
 | passaro_url | tipo | PK| FK|
-| --- | --- | ---| --| ---|
+| --- | --- | ---| --| 
 | id_passaro | INT(11)|X|X|
 | URL | VARCHAR(200)|X| |
 
