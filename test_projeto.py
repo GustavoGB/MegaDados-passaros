@@ -679,7 +679,45 @@ class TestProjeto(unittest.TestCase):
         self.assertEqual(res, tabela_cruzada)
 
     def test_view_url_passaros(self):
-        pass
+        conn = self.__class__.connection
+        email = '@'
+        cidade = 'SP'
+        nome = 'VictorLM' #Adicionando o usuario que será marcado
+        adiciona_usuario(conn, nome, email, cidade)
+
+        #adicionando o passaro que será marcado
+        adiciona_passaro(conn, "Pomba")
+
+        #Checa se o passaro existe
+        id_passaro = acha_passaro(conn, "Pomba")
+        self.assertIsNotNone(id_passaro)
+
+        # Checa se o usuario existe.
+        id_usuario = acha_usuario(conn, nome)
+        self.assertIsNotNone(id_usuario)
+
+    
+        #Inserimos algum posts
+        titulo = 'Primeiro post'
+        texto = "Eu não gosto de #Pomba."
+        url = 'https://'
+        adiciona_post(conn, titulo, id_usuario, texto, url)
+
+        #Guardamos o id do post
+        id_post = acha_post(conn, id_usuario, titulo)
+
+         #Adiciona tags
+        adiciona_tags(conn,id_post)
+
+        res = lista_tags_passaro(conn, id_passaro)
+        #Confere se a tag foi adicionada corretamente
+        self.assertEqual(res, (id_post,))
+
+        #Adiciona a url
+        adiciona_url_passaro(conn, id_passaro, id_post)
+        res = view_url_passaros(conn)
+        self.assertTrue(res) 
+    
 
 def run_sql_script(filename):
     global config

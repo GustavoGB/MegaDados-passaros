@@ -298,3 +298,18 @@ def view_aparelho_browser(conn):
         cursor.execute('SELECT * FROM aparelho_browser')
         res = cursor.fetchall()
         return res
+
+def adiciona_url_passaro(conn, id_passaro, id_post): #Mudar no futuro para um trigger
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT url from post WHERE id_post = %s', (id_post))
+        res = cursor.fetchone()
+        if res:
+            cursor.execute('INSERT INTO passaro_url (id_passaro, url) VALUES (%s, %s)', (id_passaro, res[0]))
+        else:
+            return -1
+
+def view_url_passaros(conn):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT DISTINCT * from passaro_url')
+        res = cursor.fetchall()
+        return res

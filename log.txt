@@ -1,0 +1,12 @@
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost
+DEBUG:urllib3.connectionpool:http://localhost:8000 "POST /usuarios?nome=Victor&email=%40&cidade=SP HTTP/1.1" 405 31
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost
+DEBUG:urllib3.connectionpool:http://localhost:8000 "PUT /usuarios?nome=Victor&email=%40&cidade=SP HTTP/1.1" 200 4
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost
+DEBUG:urllib3.connectionpool:http://localhost:8000 "GET /usuarios?nome=Victor HTTP/1.1" 200 1
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost
+DEBUG:urllib3.connectionpool:http://localhost:8000 "GET /usuarios?nome=Jonas HTTP/1.1" 200 4
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost
+DEBUG:urllib3.connectionpool:http://localhost:8000 "PUT /usuarios?nome=Gustavo&email=%40&cidade=SP HTTP/1.1" 200 4
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost
+DEBUG:urllib3.connectionpool:http://localhost:8000 "GET /usuarios?nome=Victor HTTP/1.1" 200 1
