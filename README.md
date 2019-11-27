@@ -149,7 +149,7 @@ if __name__ = '__main__':
             raise ValueError(f'Não posso remover usuario de id {id} na tabela usuario')
  ```
 
- A função acima realiza o UPDATE no nosso banco sql deixando o usuário inativo, isto é, realizar um DELETE lógico no mesmo. Pois é mais interessante ainda guardar o usuário inativo, já que atulizar o tamanho do banco nesse sentido é muito custoso e desnecessário.
+ A função acima realiza o UPDATE no nosso banco sql deixando o usuário inativo, isto é, realizar um DELETE lógico no mesmo. Pois é mais interessante ainda guardar o usuário inativo, já que atualizar o tamanho do banco nesse sentido é muito custoso e desnecessário.
  Ainda assim, foi necessário criar um teste para ver se as funções, incluindo esta acima, estavam funcionando corretamente. 
  ```python
  import io
